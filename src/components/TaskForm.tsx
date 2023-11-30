@@ -1,24 +1,26 @@
-import React, { ChangeEvent, useState } from "react";
-import { createTaskRequest } from "../api/tasks";
+import React, { ChangeEvent, useState } from 'react';
+import { useTasks } from '../context/useTasks';
 
 export const TaskForm = () => {
-  const [task, setTask] = useState({
-    title: "",
-    description: "",
+  const initialTaskState = {
+    title: '',
+    description: '',
     done: false,
-  });
+  };
+
+  const [task, setTask] = useState(initialTaskState);
+  const { createTask } = useTasks();
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setTask({ ...task, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const res = await createTaskRequest(task);
-    const data = await res.json();
-    console.log('🚀 ~ file: TaskForm.tsx:21 ~ handleSubmit ~ data:', data);
+    createTask(task);
+    setTask(initialTaskState);
   };
 
   return (
@@ -30,19 +32,22 @@ export const TaskForm = () => {
           placeholder="Write a task"
           className="border-2 border-gray-700 p-2 rounded-lg bg-zinc-800 block w-full my-2"
           onChange={handleChange}
+          value={task.title}
         />
         <textarea
           name="description"
           placeholder="Write a description"
           className="border-2 border-gray-700 p-2 rounded-lg bg-zinc-800 block w-full my-2"
           onChange={handleChange}
+          value={task.description}
         ></textarea>
         <label className="inline-flex items-center gap-x-2">
           <input
             type="checkbox"
             name="done"
             className="h-5 w-5 text-indigo-600"
-            onChange={ (e) => setTask({ ...task, done: !task.done }) }
+            onChange={() => setTask({ ...task, done: !task.done })}
+            checked={task.done}
           />
           <span>Done?</span>
         </label>
